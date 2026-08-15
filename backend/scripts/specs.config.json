@@ -1,0 +1,29 @@
+{
+  "release": 18,
+  "specs": [
+    {
+      "number": "23.501",
+      "title": "System architecture for the 5G System (5GS)"
+    },
+    {
+      "number": "23.502",
+      "title": "Procedures for the 5G System (5GS)"
+    },
+    {
+      "number": "23.503",
+      "title": "Policy and charging control framework for the 5G System"
+    },
+    {
+      "number": "33.501",
+      "title": "Security architecture and procedures for 5G System"
+    },
+    {
+      "number": "38.300",
+      "title": "NR and NG-RAN Overall Description"
+    },
+    {
+      "number": "38.331",
+      "title": "NR; Radio Resource Control (RRC) protocol specification"
+    }
+  ]
+}

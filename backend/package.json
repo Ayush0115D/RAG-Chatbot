@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "specs": "node scripts/download-specs.js",
+    "extract": "node scripts/extract-text.js",
     "ingest": "node scripts/ingest.js",
     "setup": "node scripts/download-specs.js && node scripts/ingest.js && npm start",
     "test": "node --test tests/"

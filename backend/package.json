@@ -9,6 +9,7 @@
     "dev": "node --watch server.js",
     "specs": "node scripts/download-specs.js",
     "extract": "node scripts/extract-text.js",
+    "check-embed": "node scripts/check-embeddings.js",
     "ingest": "node scripts/ingest.js",
     "setup": "node scripts/download-specs.js && node scripts/ingest.js && npm start",
     "test": "node --test tests/"

@@ -26,7 +26,7 @@ export const config = {
 
   llm: {
     provider: str(env.LLM_PROVIDER, 'openai').toLowerCase(),
-    apiKey: env.OPENAI_API_KEY || env.LLM_API_KEY || '',
+    apiKey: env.OPENAI_API_KEY || env.GEMINI_API_KEY || env.LLM_API_KEY || '',
     baseUrl: stripTrailingSlash(str(env.LLM_BASE_URL, 'https://api.openai.com/v1')),
     model: str(env.LLM_MODEL, 'gpt-4o-mini'),
     temperature: Number.isFinite(Number(env.LLM_TEMPERATURE))
@@ -39,7 +39,7 @@ export const config = {
     provider: str(env.EMBEDDING_PROVIDER, 'local').toLowerCase(),
     model: str(env.EMBEDDING_MODEL, 'Xenova/all-MiniLM-L6-v2'),
     apiModel: str(env.EMBED_MODEL, 'text-embedding-3-small'),
-    apiKey: env.EMBED_API_KEY || env.OPENAI_API_KEY || env.LLM_API_KEY || '',
+    apiKey: env.EMBED_API_KEY || env.OPENAI_API_KEY || env.GEMINI_API_KEY || env.LLM_API_KEY || '',
     baseUrl: stripTrailingSlash(
       str(env.EMBED_BASE_URL, env.LLM_BASE_URL, 'https://api.openai.com/v1')
     ),

@@ -6,6 +6,8 @@ const SAMPLES = [
   'Explain PDU session establishment',
 ];
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const BotAvatar = () => (
   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-xs font-bold text-white">
     5G
@@ -112,7 +114,7 @@ export default function App() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/chat/stream', {
+      const res = await fetch(`${API_BASE}/api/chat/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),

@@ -12,6 +12,7 @@
     "check-embed": "node scripts/check-embeddings.js",
     "ingest": "node scripts/ingest.js",
     "chat": "node scripts/chat.js",
+    "build": "node scripts/download-specs.js && node scripts/extract-text.js && node scripts/ingest.js",
     "setup": "node scripts/download-specs.js && node scripts/ingest.js && npm start",
     "test": "node --test tests/*.test.js"
   },
@@ -31,6 +32,8 @@
     "@huggingface/transformers": "^4.2.0",
     "@lancedb/lancedb": "^0.37.1",
     "adm-zip": "^0.6.0",
+    "apache-arrow": "^21.2.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "pdfjs-dist": "^6.2.108"

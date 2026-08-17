@@ -1,11 +1,13 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
+import cors from 'cors';
 import { ragQuery } from './src/rag.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
 
+app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
@@ -29,6 +31,7 @@ app.post('/api/chat/stream', async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
 
   try {

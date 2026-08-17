@@ -7,7 +7,7 @@ import { ragQuery } from './src/rag.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
+app.use(cors({ origin: ['https://3gpprag-chatbot.vercel.app', 'http://localhost:5173'], credentials: true }));
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
@@ -28,6 +28,7 @@ app.post('/api/chat/stream', async (req, res) => {
   const { query } = req.body;
   if (!query?.trim()) return res.status(400).json({ error: 'query is required' });
 
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');

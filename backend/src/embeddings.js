@@ -85,10 +85,11 @@ let singleton = null;
 export async function getEmbedder() {
   if (singleton) return singleton;
   const { provider } = config.embeddings;
+  let embedder;
   if (provider === 'local') {
-    singleton = new LocalEmbedder(config.embeddings.model);
+    embedder = new LocalEmbedder(config.embeddings.model);
   } else if (provider === 'openai') {
-    singleton = new ApiEmbedder({
+    embedder = new ApiEmbedder({
       apiKey: config.embeddings.apiKey,
       baseUrl: config.embeddings.baseUrl,
       model: config.embeddings.apiModel,
@@ -96,7 +97,8 @@ export async function getEmbedder() {
   } else {
     throw new Error(`unknown embedding provider: ${provider}`);
   }
-  await singleton.init();
+  await embedder.init();
+  singleton = embedder;
   return singleton;
 }
 

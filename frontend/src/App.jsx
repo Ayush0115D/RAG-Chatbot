@@ -9,8 +9,12 @@ const SAMPLES = [
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const BotAvatar = () => (
-  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-600 text-xs font-bold text-white">
-    5G
+  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 border border-slate-700">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4 text-sky-400" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 17l10 5 10-5" />
+      <path d="M2 12l10 5 10-5" />
+    </svg>
   </div>
 );
 
@@ -33,7 +37,7 @@ const TypingIndicator = () => (
 );
 
 const CitationCard = ({ index, citation }) => (
-  <div className="flex items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-800/50 px-3 py-2 text-xs">
+  <div className="flex items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-800/50 px-3 py-2 text-xs transition-colors duration-200 hover:border-sky-500/30 hover:bg-slate-800/80">
     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-sky-600/20 font-mono font-bold text-sky-400">
       {index + 1}
     </span>
@@ -53,13 +57,13 @@ const Message = ({ role, content, citations, discarded, confident }) => {
   const isStreaming = isBot && content === '';
 
   return (
-    <div className={`flex gap-3 animate-fade-in ${isBot ? 'justify-start' : 'justify-end'}`}>
+    <div className={`flex gap-3 animate-fade-in-left ${isBot ? 'justify-start' : 'justify-end animate-fade-in-right'}`}>
       {isBot && <BotAvatar />}
       <div className={`flex max-w-[75%] flex-col ${isBot ? 'items-start' : 'items-end'}`}>
         <div
           className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
             isBot
-              ? 'bg-slate-800/80 text-slate-100 rounded-tl-md'
+              ? `bg-slate-800/80 text-slate-100 rounded-tl-md ${isStreaming ? 'animate-shimmer' : ''}`
               : 'bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-tr-md'
           }`}
         >
@@ -183,8 +187,15 @@ export default function App() {
         <div className="mx-auto flex max-w-3xl flex-col gap-5">
           {messages.length === 0 && (
             <div className="mt-24 flex flex-col items-center gap-6 text-center animate-fade-in">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 text-2xl">
-                <span className="text-3xl">📡</span>
+              <div className="relative flex h-16 w-16 items-center justify-center">
+                <div className="absolute inset-0 rounded-2xl bg-sky-500/10 blur-xl" />
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-700/60 bg-slate-800/80">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7 text-sky-400" strokeWidth="1.2" stroke="currentColor">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinejoin="round" />
+                    <path d="M2 17l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
               </div>
               <div>
                 <p className="text-base font-medium text-slate-200">
@@ -200,7 +211,7 @@ export default function App() {
                     key={s}
                     onClick={() => send(s)}
                     disabled={loading}
-                    className="rounded-full border border-slate-700/60 bg-slate-800/50 px-4 py-2 text-xs text-slate-300 transition hover:border-sky-500/50 hover:bg-slate-800 hover:text-sky-300"
+                    className="group rounded-full border border-slate-700/60 bg-slate-800/50 px-4 py-2 text-xs text-slate-300 transition-all duration-200 hover:border-sky-500/50 hover:bg-sky-500/10 hover:text-sky-300 hover:shadow-lg hover:shadow-sky-500/5"
                   >
                     {s}
                   </button>
@@ -234,15 +245,20 @@ export default function App() {
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white transition hover:from-sky-400 hover:to-indigo-500 disabled:opacity-30"
+            className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white transition-all duration-200 hover:from-sky-400 hover:to-indigo-500 hover:shadow-lg hover:shadow-sky-500/20 active:scale-95 disabled:opacity-30"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="h-5 w-5"
             >
-              <path d="M3.105 2.289a.75.75 0 0 0-.826.95l1.414 4.925A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.896 28.896 0 0 0 15.293-7.154.75.75 0 0 0 0-1.115A28.897 28.897 0 0 0 3.105 2.289Z" />
+              <path d="M22 2L11 13" />
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" />
             </svg>
           </button>
         </form>

@@ -1,10 +1,7 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
 import { ragQuery } from './src/rag.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
 
 app.use(cors({ origin: ['https://3gpprag-chatbot.vercel.app', 'http://localhost:5173'], credentials: true }));
@@ -51,10 +48,6 @@ app.post('/api/chat/stream', async (req, res) => {
     res.end();
   }
 });
-
-const frontendDist = path.join(__dirname, '..', 'frontend', 'dist');
-app.use(express.static(frontendDist));
-app.get('/{*splat}', (_req, res) => res.sendFile(path.join(frontendDist, 'index.html')));
 
 const PORT = process.env.PORT || 3000;
 

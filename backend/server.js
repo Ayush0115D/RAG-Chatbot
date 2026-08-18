@@ -5,7 +5,7 @@ import { ragQuery } from './src/rag.js';
 export const app = express();
 
 app.use(cors({
-  origin: ['https://3gpprag-chatbot.vercel.app', 'http://localhost:5173'],
+  origin: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));

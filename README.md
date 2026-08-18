@@ -159,31 +159,40 @@ LLM_MODEL=llama-3.3-70b-versatile
 
 ### Embeddings
 
-| `EMBEDDING_PROVIDER` | Description |
-|---------------------|-------------|
-| `local` *(default)* | MiniLM via transformers.js — fully offline |
-| `openai` | Any OpenAI-compatible embeddings API |
+| `EMBEDDING_PROVIDER` | Description | Best for |
+|---------------------|-------------|----------|
+| `local` | MiniLM via transformers.js — fully offline, needs 512MB+ RAM | Local dev |
+| `openai` | Any OpenAI-compatible embeddings API (Gemini, OpenAI, etc.) | Render / cloud |
+
+```bash
+# Gemini embeddings (recommended for Render)
+EMBEDDING_PROVIDER=openai
+EMBED_MODEL=gemini-embedding-001
+EMBED_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
+EMBED_DIMS=3072
+
+# Local offline embeddings (for local dev only)
+EMBEDDING_PROVIDER=local
+EMBED_MODEL=Xenova/all-MiniLM-L6-v2
+EMBED_DIMS=384
+```
+
+> If you change the embedding provider, **re-run `npm run ingest`** — the vector index stores embeddings from one model only.
 
 ---
 
 ## Data ingestion
-
-### Local
-
-The `build` script runs all three steps:
 
 ```bash
 npm run build
 # → download-specs → extract-text → ingest
 ```
 
-This downloads 3GPP spec PDFs/DOCX, extracts body text, chunks it, generates embeddings with MiniLM, and stores everything in a LanceDB index under `backend/data/index/`.
+This downloads 3GPP spec PDFs/DOCX, extracts body text, chunks it, generates embeddings, and stores everything in a LanceDB index under `backend/data/index/`.
 
-### Render (cloud)
+On Render, the build script checks if the index already exists — skips the full pipeline if it does. The index and text are committed to git, so subsequent deploys are fast.
 
-On Render, the build command runs `npm run build` which re-downloads specs and re-ingests on every deploy (Render free tier has no persistent disk). The index is rebuilt at startup each time.
-
-Set `DATA_DIR=data` in Render environment variables.
+**First deploy** runs the full pipeline. **Subsequent deploys** skip it.
 
 ### Ingested specs
 
@@ -221,7 +230,8 @@ Curated in `backend/scripts/specs.config.json`:
 | `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | `LLM_MODEL` | `gemini-2.5-flash` |
 | `DATA_DIR` | `data` |
-| `CORS_ORIGIN` | `https://3gpprag-chatbot.vercel.app` |
+
+> Embeddings run locally (MiniLM) — no extra API key needed. The vector index is committed to git so deploys are fast.
 
 ---
 

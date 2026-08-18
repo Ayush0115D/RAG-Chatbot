@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { ragQuery } from './src/rag.js';
+import { getEmbedder } from './src/embeddings.js';
+import { getStore } from './src/vectorStore.js';
 
 export const app = express();
 
@@ -55,5 +57,15 @@ app.post('/api/chat/stream', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 if (process.argv[1]?.endsWith('server.js')) {
-  app.listen(PORT, () => console.log(`backend listening on http://localhost:${PORT}`));
+  app.listen(PORT, async () => {
+    console.log(`backend listening on http://localhost:${PORT}`);
+    try {
+      await getStore();
+      console.log('[startup] vector store loaded');
+      await getEmbedder();
+      console.log('[startup] embedding model loaded');
+    } catch (err) {
+      console.error('[startup] preload failed:', err.message);
+    }
+  });
 }

@@ -36,6 +36,12 @@ const TypingIndicator = () => (
   </div>
 );
 
+const specUrl = (spec) => `https://www.3gpp.org/DynaReport/${spec.replace('.', '')}.htm`;
+const specDocs = (spec) => {
+  const num = spec.replace('.', '');
+  return `https://www.tech-invite.com/3gpp-outline/toc/toc_${num.slice(0, 2)}-${num.slice(2)}.htm`;
+};
+
 const CitationCard = ({ index, citation }) => (
   <div className="flex items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-800/50 px-3 py-2 text-xs transition-colors duration-200 hover:border-sky-500/30 hover:bg-slate-800/80">
     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-sky-600/20 font-mono font-bold text-sky-400">
@@ -67,7 +73,12 @@ const Message = ({ role, content, citations, discarded, confident }) => {
               : 'bg-gradient-to-br from-sky-600 to-sky-700 text-white rounded-tr-md'
           }`}
         >
-          {isStreaming ? <TypingIndicator /> : (
+          {isStreaming ? (
+            <div className="flex items-center gap-2">
+              <TypingIndicator />
+              <span className="text-xs text-slate-400">Searching specs and generating answer...</span>
+            </div>
+          ) : (
             <p className="whitespace-pre-wrap">{content}</p>
           )}
         </div>
@@ -78,9 +89,37 @@ const Message = ({ role, content, citations, discarded, confident }) => {
               <CitationCard key={i} index={i} citation={c} />
             ))}
             {citations.length > 3 && (
-              <span className="ml-8 text-xs text-slate-500">
-                +{citations.length - 3} more source{citations.length - 3 > 1 ? 's' : ''}
-              </span>
+              <div className="ml-8 flex items-center gap-3">
+                <span className="text-xs text-slate-500">
+                  +{citations.length - 3} more source{citations.length - 3 > 1 ? 's' : ''}
+                </span>
+                <span className="text-slate-700">|</span>
+                <span className="text-xs text-slate-500">External sources:</span>
+                <a
+                  href={specUrl(citations[3].spec)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="3GPP overview"
+                  className="text-slate-500 hover:text-sky-400 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+                <a
+                  href={specDocs(citations[3].spec)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Documentation"
+                  className="text-slate-500 hover:text-sky-400 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                  </svg>
+                </a>
+              </div>
             )}
           </div>
         )}
@@ -105,6 +144,7 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showWarmup, setShowWarmup] = useState(true);
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -170,6 +210,7 @@ export default function App() {
       ]);
     }
     setLoading(false);
+    setShowWarmup(false);
   };
 
   return (
@@ -182,6 +223,14 @@ export default function App() {
           Grounded answers over Telecom specifications
         </p>
       </header>
+
+      {showWarmup && (
+        <div className="border-b border-amber-500/20 bg-amber-500/5 px-6 py-3 text-center">
+          <p className="text-xs text-amber-400">
+            This app runs on a Render free tier — the first response may take up to 50 seconds as the server wakes up. Please wait after sending your first question.
+          </p>
+        </div>
+      )}
 
       <main className="flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto flex max-w-3xl flex-col gap-5">

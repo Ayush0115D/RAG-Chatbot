@@ -1,91 +1,127 @@
 <div align="center">
 
-# 3GPP RAG Chatbot
+# 📡 3GPP RAG Chatbot
 
-A **Retrieval-Augmented Generation** chatbot that answers questions about **Telecom 3GPP standards** (5G/NR) with near-zero hallucinations.
+### 🔎 AI Assistant for 3GPP / 5G / NR Standards
 
-[Live Demo](https://3gpprag-chatbot.vercel.app) · [Backend API](https://rag-chatbot-1-6loy.onrender.com/api/health)
+A **Retrieval-Augmented Generation (RAG)** chatbot that answers questions about **3GPP telecom standards** using grounded retrieval, hybrid search, citations, and hallucination guardrails.
+
+<br/>
+
+[🚀 Live Demo](https://3gpprag-chatbot.vercel.app) • [💚 Backend API](https://rag-chatbot-1-6loy.onrender.com/api/health)
+
+<br/>
+
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
+![LanceDB](https://img.shields.io/badge/LanceDB-Vector%20DB-blue)
+![RAG](https://img.shields.io/badge/AI-RAG-purple)
+![3GPP](https://img.shields.io/badge/Domain-3GPP%205G%2FNR-orange)
 
 </div>
 
 ---
 
-## How it works
+## ⚡ How It Works
+
+```text
+┌──────────────────┐
+│   User Question  │
+└────────┬─────────┘
+         ↓
+┌──────────────────┐
+│    Embedding     │
+└────────┬─────────┘
+         ↓
+┌──────────────────────────┐
+│     Hybrid Retrieval     │
+│  🔹 Vector + 🔹 BM25     │
+└────────┬─────────────────┘
+         ↓
+┌──────────────────────────┐
+│  Similarity Thresholding │
+└────────┬─────────────────┘
+         ↓
+┌──────────────────────────┐
+│      Grounded LLM        │
+└────────┬─────────────────┘
+         ↓
+┌──────────────────────────┐
+│  Answer + 📚 Citations   │
+└──────────────────────────┘
 
 ```
-User Question → Embedding → Hybrid Search (Vector + BM25) → Grounded LLM → Answer with Citations
-```
+## ✨ Features
 
-Retrieves the most relevant passages from 3GPP specs, then asks the LLM to answer **only from those passages** — citing exact spec and section numbers.
+- 🧩 **Section-aware chunking** — preserves spec + section metadata (e.g. `TS 23.501 §5.15.2`)
+- 🔀 **Hybrid retrieval** — dense (LanceDB cosine) + sparse (BM25) search with score fusion
+- 🛡️ **Hallucination guardrails** — similarity thresholding, grounding verification, and honest "I don't know" fallback
+- ⚡ **Streaming responses** — SSE-based token streaming with clickable source citations
+- 🧠 **Local embeddings** — runs offline via `@huggingface/transformers` (MiniLM), with no API key needed
+- 🔌 **Provider-agnostic LLM** — OpenAI, Gemini, Ollama, Groq, or any OpenAI-compatible endpoint
 
 ---
 
-## Features
-
-- **Section-aware chunking** — preserves spec + section metadata (e.g. `TS 23.501 §5.15.2`)
-- **Hybrid retrieval** — dense (LanceDB cosine) + sparse (BM25) search with score fusion
-- **Hallucination guardrails** — similarity thresholding, grounding verification, honest "I don't know" fallback
-- **Streaming responses** — SSE-based token streaming with clickable source citations
-- **Local embeddings** — runs offline via `@huggingface/transformers` (MiniLM), no API key needed
-- **Provider-agnostic LLM** — OpenAI, Gemini, Ollama, Groq, or any OpenAI-compatible endpoint
-
----
-
-## Tech stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Runtime | Node.js 18+ (ESM) |
-| Backend API | Express 5 |
-| Frontend | React 19, Vite 8, Tailwind CSS 4 |
-| PDF parsing | pdfjs-dist |
-| Embeddings | @huggingface/transformers (local) |
-| Vector store | LanceDB (embedded) |
-| Keyword search | BM25 (in-memory) |
-| LLM | Any OpenAI-compatible endpoint |
-
----
-
-## Project structure
+| 🟢 **Runtime** | Node.js 18+ (ESM) |
+| 🔙 **Backend API** | Express 5 |
+| 🎨 **Frontend** | React 19, Vite 8, Tailwind CSS 4 |
+| 📄 **PDF Parsing** | pdfjs-dist |
+| 🧠 **Embeddings** | `@huggingface/transformers` (local) |
+| 🗄️ **Vector Store** | LanceDB (embedded) |
+| 🔤 **Keyword Search** | BM25 (in-memory) |
+| 🤖 **LLM** | Any OpenAI-compatible endpoint |
 
 ```
+---
+## Project structure
+
+
 RAG-Chatbot/
 ├── backend/
 │   ├── src/
-│   │   ├── config.js              # Env-based configuration
+│   │   ├── config.js              # Environment configuration
 │   │   ├── chunker.js             # Section-aware chunking
 │   │   ├── embeddings.js          # Local + API embedding providers
 │   │   ├── vectorStore.js         # LanceDB wrapper
 │   │   ├── keywordIndex.js        # BM25 keyword index
 │   │   ├── retriever.js           # Hybrid retrieval + threshold guardrail
-│   │   ├── llm.js                 # OpenAI-compatible chat client (streaming)
+│   │   ├── llm.js                 # OpenAI-compatible streaming client
 │   │   ├── rag.js                 # Grounded generation pipeline
-│   │   ├── prompt.js              # System prompt for 3GPP grounding
+│   │   ├── prompt.js              # 3GPP grounding system prompt
 │   │   ├── pdfParser.js           # PDF text extraction
 │   │   ├── docxParser.js          # DOCX text extraction
-│   │   ├── extractBody.js         # Body-only extraction from 3GPP docs
+│   │   ├── extractBody.js         # 3GPP body extraction
 │   │   └── specResolver.js        # 3GPP archive version resolver
+│   │
 │   ├── scripts/
-│   │   ├── download-specs.js      # Download 3GPP specs from official archive
-│   │   ├── specs.config.json      # Curated spec list
+│   │   ├── download-specs.js      # Download 3GPP specifications
+│   │   ├── specs.config.json      # Curated specification list
 │   │   ├── extract-text.js        # DOCX/PDF → plain text
 │   │   ├── ingest.js              # Chunk → embed → store
 │   │   └── chat.js                # CLI REPL
+│   │
 │   ├── tests/
-│   ├── server.js                  # Express API (health, chat, chat/stream)
+│   ├── server.js                  # Express API
 │   ├── .env.example
 │   └── package.json
+│
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx                # Chat UI with streaming + citations
 │   │   ├── index.css              # Tailwind + animations
-│   │   └── main.jsx               # React entry
+│   │   └── main.jsx               # React entry point
 │   ├── index.html
 │   ├── vite.config.js
 │   └── package.json
+│
 └── .gitignore
-```
 
+```
 ---
 
 ## Getting started
@@ -260,6 +296,16 @@ Curated in `backend/scripts/specs.config.json`:
 
 ---
 
+## Understanding the UI
+
+- **Source cards** — Each card shows a retrieved text chunk from the specs. The number is its cosine similarity to your query (higher = more relevant). Up to 3 are shown; additional sources are collapsed.
+- **"+N more sources"** — Additional retrieved chunks beyond the top 3 displayed cards.
+- **"N weaker candidates filtered"** — The retriever gathered ~20 candidates via hybrid search, then discarded those below the similarity threshold (0.35). Low-confidence evidence is dropped rather than used — this is a core hallucination guardrail.
+- **Streaming response** — The answer streams token-by-token from the LLM, constrained to the retrieved context only.
+- **Confidence indicator** — If shown, the generated answer couldn't be fully grounded in the retrieved context.
+
+---
+
 ## Testing
 
 ```bash
@@ -268,7 +314,3 @@ npm test
 ```
 
 ---
-
-## License
-
-MIT

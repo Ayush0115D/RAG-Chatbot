@@ -24,7 +24,7 @@ Retrieves the most relevant passages from 3GPP specs, then asks the LLM to answe
 
 - **Section-aware chunking** — preserves spec + section metadata (e.g. `TS 23.501 §5.15.2`)
 - **Hybrid retrieval** — dense (LanceDB cosine) + sparse (BM25) search with score fusion
-- **Hallucination guardrails** — similarity thresholding, grounding verification, honest "I don't know" fallback
+- **Hallucination guardrails** — similarity thresholding, section-reference verification (JSON API), honest "I don't know" fallback
 - **Streaming responses** — SSE-based token streaming with clickable source citations
 - **Local embeddings** — runs offline via `@huggingface/transformers` (MiniLM), no API key needed
 - **Provider-agnostic LLM** — OpenAI, Gemini, Ollama, Groq, or any OpenAI-compatible endpoint
@@ -165,13 +165,13 @@ LLM_MODEL=llama-3.3-70b-versatile
 | `openai` | Any OpenAI-compatible embeddings API (Gemini, OpenAI, etc.) | Render / cloud |
 
 ```bash
-# Gemini embeddings (recommended for Render)
+# Gemini embeddings (API-based — re-ingest the index first)
 EMBEDDING_PROVIDER=openai
 EMBED_MODEL=gemini-embedding-001
 EMBED_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
 EMBED_DIMS=3072
 
-# Local offline embeddings (for local dev only)
+# Local embeddings (matches the committed 384-dim index)
 EMBEDDING_PROVIDER=local
 EMBED_MODEL=Xenova/all-MiniLM-L6-v2
 EMBED_DIMS=384
@@ -196,7 +196,7 @@ On Render, the build script checks if the index already exists — skips the ful
 
 ### Ingested specs
 
-Curated in `backend/scripts/specs.config.json`:
+The committed index currently covers these four specs:
 
 | Spec | Title |
 |------|-------|
@@ -204,8 +204,8 @@ Curated in `backend/scripts/specs.config.json`:
 | TS 23.502 | Procedures for the 5G System |
 | TS 23.503 | Policy and charging control framework |
 | TS 33.501 | Security architecture for 5G |
-| TS 38.300 | NR and NG-RAN overall description |
-| TS 38.331 | NR; RRC protocol specification |
+
+`backend/scripts/specs.config.json` also lists TS 38.300 and TS 38.331. They are only downloaded and ingested when the index is rebuilt from scratch (the build script skips the pipeline when an index already exists).
 
 ---
 
@@ -229,9 +229,12 @@ Curated in `backend/scripts/specs.config.json`:
 | `LLM_PROVIDER` | `gemini` |
 | `LLM_BASE_URL` | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | `LLM_MODEL` | `gemini-2.5-flash` |
+| `EMBEDDING_PROVIDER` | `local` |
+| `EMBED_MODEL` | `Xenova/all-MiniLM-L6-v2` |
+| `EMBED_DIMS` | `384` |
 | `DATA_DIR` | `data` |
 
-> Embeddings run locally (MiniLM) — no extra API key needed. The vector index is committed to git so deploys are fast.
+> The committed index was built with local MiniLM embeddings (384 dims), so Render uses `EMBEDDING_PROVIDER=local` — no embedding API key needed. If you switch to API embeddings (e.g. `gemini-embedding-001`, 3072 dims), re-run `npm run ingest` and update `EMBED_DIMS` to match.
 
 ---
 
@@ -239,9 +242,9 @@ Curated in `backend/scripts/specs.config.json`:
 
 1. **Similarity thresholding** — low-confidence retrieval results are discarded
 2. **Grounding prompt** — LLM instructed to answer only from provided context
-3. **Citation enforcement** — every answer must reference spec + section numbers
+3. **Citation enforcement** — answers cite retrieved chunks as `[1]`, `[2]`…, mapped to spec + section source cards in the UI
 4. **Honest fallback** — unanswered questions return "I don't know" instead of guessing
-5. **Grounding verification** — answer is re-checked against retrieved context before returning
+5. **Grounding verification (JSON API)** — `/api/chat` checks cited section numbers against the retrieved chunks before returning; the streaming endpoint applies retrieval thresholding but skips this post-check
 
 ---
 
